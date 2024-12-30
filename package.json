@@ -1,0 +1,39 @@
+{
+  "name": "drips-search",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "lint": "gts lint",
+    "clean": "gts clean",
+    "compile": "tsc",
+    "fix": "gts fix",
+    "prepare": "npm run compile",
+    "pretest": "npm run compile",
+    "posttest": "npm run lint",
+    "check": "tsc --noEmit",
+    "dev": "ts-node src/index.ts",
+    "start": "node build/src/main.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "devDependencies": {
+    "@types/express": "^5.0.0",
+    "@types/node": "^22.10.2",
+    "@types/pg": "^8.11.10",
+    "@types/winston": "^2.4.4",
+    "gts": "^6.0.2",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.7.2"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.7",
+    "dotenv-expand": "^12.0.1",
+    "express": "^4.21.2",
+    "meilisearch": "^0.46.0",
+    "pg": "^8.13.1",
+    "winston": "^3.17.0",
+    "zod": "^3.24.1"
+  }
+}
