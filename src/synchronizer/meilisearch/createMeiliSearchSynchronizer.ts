@@ -129,15 +129,6 @@ export function createMeiliSearchSynchronizer(
           'ownerAccountId',
           'description',
         ],
-        sortableAttributes: ['updatedAt'],
-        rankingRules: [
-          'exactness',
-          'words',
-          'typo',
-          'proximity',
-          'attribute',
-          'sort',
-        ],
         distinctAttribute: 'id',
         displayedAttributes: [
           'name',
@@ -165,15 +156,6 @@ export function createMeiliSearchSynchronizer(
           'ownerAddress',
           'ownerAccountId',
         ],
-        sortableAttributes: ['updatedAt'],
-        rankingRules: [
-          'words',
-          'typo',
-          'proximity',
-          'attribute',
-          'sort',
-          'exactness',
-        ],
         distinctAttribute: 'id',
         displayedAttributes: [
           'id',
@@ -186,7 +168,7 @@ export function createMeiliSearchSynchronizer(
           'url',
         ],
         typoTolerance: {
-          disableOnAttributes: ['id', 'ownerAccountId', 'ownerAddress'],
+          disableOnAttributes: ['id', 'ownerAccountId', 'ownerAddress', 'url'],
         },
       });
     };
