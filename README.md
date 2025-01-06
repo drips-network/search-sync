@@ -66,10 +66,3 @@ sequenceDiagram
 2. Configure the environment variables according to your setup
 3. Run `docker compose up -d` to spin up MeiliSearch
 4. Run `npm run dev` to run the app
-
-## Deployment
-
-Deploy either as:
-
-- Standalone Node.js service
-- Docker container (using provided `docker-compose.yml`)
