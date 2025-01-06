@@ -13,87 +13,51 @@ import {
   postgresConfigSchema,
 } from '../../../config/configSchema';
 
+/**
+ * Simple change detection strategy that polls all records in the database at a fixed interval.
+ *
+ * TODO: when performance becomes an issue, consider using a more efficient change detection strategy:
+ * - Add an `updatedAt` column to Projects and DripLists tables and query for records that have been updated since the last poll.
+ * - Use CDC (Change Data Capture) to stream changes from the database.
+ */
 export function createPollingChangeDetection(
   pool: Pool,
   logger: winston.Logger,
   {
     schema,
-    batchSize,
     pollingInterval,
   }: z.infer<typeof postgresConfigSchema>['changeDetection'],
 ): ChangeDetectionStrategy {
   let interval: NodeJS.Timeout | null = null;
   let isRunning = false;
-  let lastProcessedTime = new Date(0); // Start from the beginning of time - OK for now.
+
   if (!ALLOWED_DB_SCHEMAS.includes(schema as any)) {
     throw new Error(`Schema "${schema}" is not allowed.`);
   }
 
-  const getChangedDripLists = async (since: Date): Promise<DripList[]> => {
-    const sql = `
-        SELECT "id", "name", "updatedAt", "description", "ownerAddress", "ownerAccountId"
-        FROM ${schema}."DripLists"
-        WHERE "updatedAt" >= $1
-        ORDER BY "updatedAt" ASC
-        LIMIT $2
-        FOR UPDATE SKIP LOCKED
-      `;
+  const getAllRecords = async (): Promise<Changes> => {
+    const dripListsSql = `
+      SELECT "id", "name", "description", "ownerAddress", "ownerAccountId"
+      FROM ${schema}."DripLists"
+    `;
 
-    return (await pool.query<DripList>(sql, [since, batchSize])).rows;
-  };
+    const projectsSql = `
+      SELECT "id", "name", "description", "ownerAddress", "ownerAccountId", "url"
+      FROM ${schema}."GitProjects"
+    `;
 
-  const getChangedProjects = async (since: Date): Promise<Project[]> => {
-    const sql = `
-        SELECT "id", "name", "updatedAt", "description", "ownerAddress", "ownerAccountId", "url"
-        FROM ${schema}."GitProjects"
-        WHERE "updatedAt" >= $1
-        ORDER BY "updatedAt" ASC
-        LIMIT $2
-        FOR UPDATE SKIP LOCKED
-      `;
+    const [dripLists, projects] = await Promise.all([
+      pool.query<DripList>(dripListsSql).then(result => result.rows),
+      pool.query<Project>(projectsSql).then(result => result.rows),
+    ]);
 
-    return (await pool.query<Project>(sql, [since, batchSize])).rows;
-  };
-
-  const gatherChanges = async (since: Date): Promise<Changes | null> => {
-    await pool.query('BEGIN');
-    try {
-      const [dripLists, projects] = await Promise.all([
-        getChangedDripLists(since),
-        getChangedProjects(since),
-      ]);
-
-      await pool.query('COMMIT');
-
-      if (dripLists.length === 0 && projects.length === 0) {
-        return null;
-      }
-
-      const allTimestamps = [
-        ...dripLists.map(dl => dl.updatedAt),
-        ...projects.map(p => p.updatedAt),
-      ];
-
-      const latestTimestamp = new Date(
-        Math.max(...allTimestamps.map(t => t.getTime())) + 1,
-      );
-
-      return {
-        dripLists,
-        projects,
-        timestamp: latestTimestamp,
-      };
-    } catch (error) {
-      await pool.query('ROLLBACK');
-      throw error;
-    }
+    return {dripLists, projects};
   };
 
   return {
     async start(onChangesDetected: OnChangesDetected) {
       if (isRunning) {
         logger.warn('Polling strategy already running.');
-
         return;
       }
 
@@ -106,15 +70,8 @@ export function createPollingChangeDetection(
         if (!isRunning) return;
 
         try {
-          const changes = await gatherChanges(lastProcessedTime);
-
-          if (changes) {
-            lastProcessedTime = changes.timestamp;
-
-            await onChangesDetected(changes);
-          } else {
-            logger.info('No changes detected.');
-          }
+          const records = await getAllRecords();
+          await onChangesDetected(records);
         } catch (error) {
           logger.error('Error polling for changes:', {
             metadata: {
@@ -126,7 +83,6 @@ export function createPollingChangeDetection(
       };
 
       await poll(); // Initial poll
-
       interval = setInterval(poll, pollingInterval);
     },
 

@@ -12,7 +12,6 @@ export function createMeiliSearchSynchronizer(
 
   const metrics: SyncMetrics = {
     lastSyncTime: new Date(0),
-    lastSuccessfulSync: null,
     totalProcessedRecords: 0,
   };
 
@@ -26,7 +25,6 @@ export function createMeiliSearchSynchronizer(
             id: dl.id,
             name: dl.name,
             type: 'drip_list',
-            updatedAt: dl.updatedAt,
             description: dl.description,
             ownerAddress: dl.ownerAddress,
             ownerAccountId: dl.ownerAccountId,
@@ -38,7 +36,6 @@ export function createMeiliSearchSynchronizer(
             id: p.id,
             name: p.name,
             type: 'project',
-            updatedAt: p.updatedAt,
             description: p.description,
             ownerAddress: p.ownerAddress,
             ownerAccountId: p.ownerAccountId,
@@ -64,18 +61,15 @@ export function createMeiliSearchSynchronizer(
         );
       }
 
-      // Only update metrics after confirming tasks succeeded.
-      metrics.lastSyncTime = changes.timestamp;
-      metrics.lastSuccessfulSync = new Date();
-      metrics.totalProcessedRecords +=
+      metrics.lastSyncTime = new Date();
+      metrics.totalProcessedRecords =
         changes.dripLists.length + changes.projects.length;
 
       logger.info('Sync completed:', {
         metadata: {
           dripListsCount: changes.dripLists.length,
           projectsCount: changes.projects.length,
-          timestamp: changes.timestamp.toISOString(),
-          metrics,
+          ...metrics,
         },
       });
     } catch (error) {
@@ -134,7 +128,6 @@ export function createMeiliSearchSynchronizer(
           'name',
           'id',
           'type',
-          'updatedAt',
           'description',
           'ownerAddress',
           'ownerAccountId',
@@ -161,7 +154,6 @@ export function createMeiliSearchSynchronizer(
           'id',
           'name',
           'type',
-          'updatedAt',
           'description',
           'ownerAddress',
           'ownerAccountId',
@@ -196,7 +188,6 @@ export function createMeiliSearchSynchronizer(
           stack: error instanceof Error ? error.stack : undefined,
         },
       });
-      // Reset running state and cleanup on startup failure
       isRunning = false;
       await changeDetection.stop().catch(stopError => {
         logger.warn(

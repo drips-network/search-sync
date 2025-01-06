@@ -1,6 +1,5 @@
 export type SyncMetrics = {
   lastSyncTime: Date;
-  lastSuccessfulSync: Date | null;
   totalProcessedRecords: number;
 };
 

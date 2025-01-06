@@ -12,7 +12,6 @@ export const postgresConfigSchema = z.object({
   }),
   changeDetection: z.object({
     schema: z.enum(ALLOWED_DB_SCHEMAS),
-    batchSize: z.number().int().positive().default(1000),
     pollingInterval: z.number().int().positive().default(30000), // 5 minutes. Specific to current - polling - strategy.
   }),
 });

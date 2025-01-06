@@ -17,10 +17,6 @@ function loadConfig(): Config {
       },
       changeDetection: {
         schema: process.env.DB_SCHEMA,
-        batchSize: process.env.DB_BATCH_SIZE
-          ? parseInt(process.env.DB_BATCH_SIZE, 10)
-          : undefined,
-
         pollingInterval: process.env.DB_POLLING_INTERVAL
           ? parseInt(process.env.DB_POLLING_INTERVAL, 10)
           : undefined,
