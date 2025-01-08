@@ -12,7 +12,7 @@
     "posttest": "npm run lint",
     "check": "tsc --noEmit",
     "dev": "ts-node src/index.ts",
-    "start": "node build/src/main.js"
+    "start": "node build/src/index.js"
   },
   "keywords": [],
   "author": "",
