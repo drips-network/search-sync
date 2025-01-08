@@ -234,20 +234,6 @@ export function createMeiliSearchSynchronizer(
     });
   };
 
-  const isHealthy = async () => {
-    try {
-      await meiliSearch.health();
-      return true;
-    } catch (error) {
-      logger.error(
-        `MeiliSearch synchronizer health check failed: ${
-          error instanceof Error ? error.message : String(error)
-        })`,
-      );
-      return false;
-    }
-  };
-
   const getMetrics = (): SyncMetrics => ({...metrics});
 
   return {
@@ -255,6 +241,5 @@ export function createMeiliSearchSynchronizer(
     start,
     stop,
     getMetrics,
-    isHealthy,
   };
 }

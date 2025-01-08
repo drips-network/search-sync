@@ -6,12 +6,9 @@ import {createPollingChangeDetection} from './synchronizer/meilisearch/changeDet
 import {logger} from './logger';
 import * as winston from 'winston';
 import {Synchronizer} from './synchronizer/types';
-import express, {Request, Response} from 'express';
-import {Server} from 'http';
 import {config} from './config/configLoader';
 
 async function initializeApp() {
-  const app = express();
   const pool = new Pool({
     connectionString: config.postgres.connectionString,
   });
@@ -32,35 +29,15 @@ async function initializeApp() {
     logger,
   );
 
-  app.get('/health', async (_req: Request, res: Response) => {
-    const isHealthy = await synchronizer.isHealthy();
-
-    res
-      .status(isHealthy ? 200 : 503)
-      .json({status: isHealthy ? 'ok' : 'unhealthy'});
-  });
-
-  const server = app.listen(config.port, () => {
-    logger.info(`HTTP server listening on port ${config.port}`);
-  });
-
-  return {pool, synchronizer, server};
+  return {pool, synchronizer};
 }
 
 async function main() {
   logger.info('Starting application... 🚀', {metadata: {env: config.nodeEnv}});
 
-  const {pool, synchronizer, server} = await initializeApp();
+  const {pool, synchronizer} = await initializeApp();
 
-  registerShutdownHandlers(pool, synchronizer, logger, server);
-
-  if (!(await synchronizer.isHealthy())) {
-    logger.error('Synchronizer is unhealthy, exiting...');
-
-    await shutdown(pool, synchronizer, 'UNHEALTHY', logger);
-
-    return;
-  }
+  registerShutdownHandlers(pool, synchronizer, logger);
 
   try {
     await synchronizer.start();
@@ -75,20 +52,12 @@ async function shutdown(
   synchronizer: Synchronizer,
   signal: string,
   logger: winston.Logger,
-  server?: Server,
 ) {
   logger.info(`${signal} received, starting graceful shutdown...`);
 
   try {
     await synchronizer.stop();
     await pool.end();
-    if (server) {
-      await new Promise<void>((resolve, reject) => {
-        server.close((err: Error | undefined) =>
-          err ? reject(err) : resolve(),
-        );
-      });
-    }
 
     logger.info('Graceful shutdown completed.');
     process.exitCode = 1;
@@ -102,12 +71,9 @@ function registerShutdownHandlers(
   pool: Pool,
   synchronizer: Synchronizer,
   logger: winston.Logger,
-  server: Server,
 ) {
   ['SIGTERM', 'SIGINT'].forEach(signal => {
-    process.once(signal, () =>
-      shutdown(pool, synchronizer, signal, logger, server),
-    );
+    process.once(signal, () => shutdown(pool, synchronizer, signal, logger));
   });
 }
 

@@ -8,5 +8,4 @@ export type Synchronizer = {
   start: () => Promise<void>;
   stop: () => Promise<void>;
   getMetrics: () => SyncMetrics;
-  isHealthy: () => Promise<boolean>;
 };
