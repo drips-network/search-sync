@@ -28,6 +28,7 @@ export function createMeiliSearchSynchronizer(
             description: dl.description,
             ownerAddress: dl.ownerAddress,
             ownerAccountId: dl.ownerAccountId,
+            chain: dl.chain,
           })),
           {primaryKey: 'id'},
         ),
@@ -43,6 +44,7 @@ export function createMeiliSearchSynchronizer(
             avatarCid: p.avatarCid,
             emoji: p.emoji,
             color: p.color,
+            chain: p.chain,
           })),
           {primaryKey: 'id'},
         ),
@@ -125,8 +127,10 @@ export function createMeiliSearchSynchronizer(
           'ownerAddress',
           'ownerAccountId',
           'description',
+          'chain',
         ],
         distinctAttribute: 'id',
+        filterableAttributes: ['name', 'chain'],
         displayedAttributes: [
           'name',
           'id',
@@ -134,6 +138,7 @@ export function createMeiliSearchSynchronizer(
           'description',
           'ownerAddress',
           'ownerAccountId',
+          'chain',
         ],
         typoTolerance: {
           disableOnAttributes: ['id', 'ownerAccountId', 'ownerAddress'],
@@ -154,8 +159,10 @@ export function createMeiliSearchSynchronizer(
           'avatarCid',
           'emoji',
           'color',
+          'chain',
         ],
         distinctAttribute: 'id',
+        filterableAttributes: ['name', 'chain'],
         displayedAttributes: [
           'id',
           'name',
@@ -167,6 +174,7 @@ export function createMeiliSearchSynchronizer(
           'avatarCid',
           'emoji',
           'color',
+          'chain',
         ],
         typoTolerance: {
           disableOnAttributes: ['id', 'ownerAccountId', 'ownerAddress', 'url'],

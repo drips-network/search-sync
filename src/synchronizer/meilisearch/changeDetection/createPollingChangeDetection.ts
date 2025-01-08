@@ -10,6 +10,7 @@ import {Pool} from 'pg';
 import {z} from 'zod';
 import {
   ALLOWED_DB_SCHEMAS,
+  DbSchema,
   postgresConfigSchema,
 } from '../../../config/configSchema';
 
@@ -24,31 +25,39 @@ export function createPollingChangeDetection(
   pool: Pool,
   logger: winston.Logger,
   {
-    schema,
+    schemas,
     pollingInterval,
   }: z.infer<typeof postgresConfigSchema>['changeDetection'],
 ): ChangeDetectionStrategy {
   let interval: NodeJS.Timeout | null = null;
   let isRunning = false;
 
-  if (!ALLOWED_DB_SCHEMAS.includes(schema as any)) {
-    throw new Error(`Schema "${schema}" is not allowed.`);
+  for (const schema of schemas) {
+    if (!ALLOWED_DB_SCHEMAS.includes(schema as any)) {
+      throw new Error(`Schema "${schema}" is not allowed.`);
+    }
   }
 
   const getAllRecords = async (): Promise<Changes> => {
-    const dripListsSql = `
-      SELECT "id", "name", "description", "ownerAddress", "ownerAccountId"
+    const dripListsSql = (schema: DbSchema) => `
+      SELECT "id", "name", "description", "ownerAddress", "ownerAccountId", '${schema}' AS chain
       FROM ${schema}."DripLists"
     `;
 
-    const projectsSql = `
-      SELECT "id", "name", "description", "ownerAddress", "ownerAccountId", "url", "avatarCid", "emoji", "color"
+    const projectsSql = (schema: DbSchema) => `
+      SELECT "id", "name", "description", "ownerAddress", "ownerAccountId", "url", "avatarCid", "emoji", "color", '${schema}' AS chain
       FROM ${schema}."GitProjects"
     `;
 
+    const dripListsQueries = schemas.map(chain => dripListsSql(chain));
+    const dripListsFullQuery = `${dripListsQueries.join(' UNION ')}`;
+
+    const projectsQueries = schemas.map(chain => projectsSql(chain));
+    const projectsSqlFullQuery = `${projectsQueries.join(' UNION ')}`;
+
     const [dripLists, projects] = await Promise.all([
-      pool.query<DripList>(dripListsSql).then(result => result.rows),
-      pool.query<Project>(projectsSql).then(result => result.rows),
+      pool.query<DripList>(dripListsFullQuery).then(result => result.rows),
+      pool.query<Project>(projectsSqlFullQuery).then(result => result.rows),
     ]);
 
     return {dripLists, projects};

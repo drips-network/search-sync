@@ -12,6 +12,7 @@ export type DripList = {
   description: string;
   ownerAddress: string;
   ownerAccountId: string;
+  chain: string;
 };
 
 export type Project = {
@@ -24,6 +25,7 @@ export type Project = {
   avatarCid: string;
   emoji: string;
   color: string;
+  chain: string;
 };
 
 export type Changes = {

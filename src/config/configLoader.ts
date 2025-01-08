@@ -11,7 +11,7 @@ function loadConfig(): Config {
     postgres: {
       connectionString: process.env.DB_CONNECTION_STRING,
       changeDetection: {
-        schema: process.env.DB_SCHEMA,
+        schemas: process.env.DB_SCHEMAS?.split(','),
         pollingInterval: process.env.DB_POLLING_INTERVAL
           ? parseInt(process.env.DB_POLLING_INTERVAL, 10)
           : undefined,

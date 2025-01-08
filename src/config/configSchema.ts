@@ -1,11 +1,12 @@
 import {z} from 'zod';
 
 export const ALLOWED_DB_SCHEMAS = ['sepolia', 'mainnet', 'filecoin'] as const;
+export type DbSchema = (typeof ALLOWED_DB_SCHEMAS)[number];
 
 export const postgresConfigSchema = z.object({
   connectionString: z.string(),
   changeDetection: z.object({
-    schema: z.enum(ALLOWED_DB_SCHEMAS),
+    schemas: z.array(z.enum(ALLOWED_DB_SCHEMAS)),
     pollingInterval: z.number().int().positive().default(30000), // 5 minutes. Specific to current - polling - strategy.
   }),
 });
