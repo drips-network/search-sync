@@ -21,6 +21,9 @@ export type Project = {
   description: string;
   ownerAddress: string;
   ownerAccountId: string;
+  avatarCid: string;
+  emoji: string;
+  color: string;
 };
 
 export type Changes = {

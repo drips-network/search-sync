@@ -42,7 +42,7 @@ export function createPollingChangeDetection(
     `;
 
     const projectsSql = `
-      SELECT "id", "name", "description", "ownerAddress", "ownerAccountId", "url"
+      SELECT "id", "name", "description", "ownerAddress", "ownerAccountId", "url", "avatarCid", "emoji", "color"
       FROM ${schema}."GitProjects"
     `;
 
