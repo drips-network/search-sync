@@ -231,12 +231,11 @@ export function createMeiliSearchSynchronizer(
       await meiliSearch.health();
       return true;
     } catch (error) {
-      logger.error('MeiliSearch synchronizer health check failed.', {
-        metadata: {
-          error: error instanceof Error ? error.message : String(error),
-          stack: error instanceof Error ? error.stack : undefined,
-        },
-      });
+      logger.error(
+        `MeiliSearch synchronizer health check failed: ${
+          error instanceof Error ? error.message : String(error)
+        })`,
+      );
       return false;
     }
   };
