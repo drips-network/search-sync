@@ -1,20 +1,15 @@
 import {z} from 'zod';
 import {configSchema, type Config} from './configSchema';
-import 'dotenv/config';
+import dotenv from 'dotenv';
+import dotenvExpand from 'dotenv-expand';
+
+dotenvExpand.expand(dotenv.config());
 
 function loadConfig(): Config {
   const config = {
     env: process.env.NODE_ENV,
     postgres: {
-      connection: {
-        host: process.env.DB_HOST,
-        port: process.env.DB_PORT
-          ? parseInt(process.env.DB_PORT, 10)
-          : undefined,
-        database: process.env.DB_NAME,
-        user: process.env.DB_USER,
-        password: process.env.DB_PASSWORD,
-      },
+      connectionString: process.env.DB_CONNECTION_STRING,
       changeDetection: {
         schema: process.env.DB_SCHEMA,
         pollingInterval: process.env.DB_POLLING_INTERVAL

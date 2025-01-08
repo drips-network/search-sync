@@ -12,7 +12,9 @@ import {config} from './config/configLoader';
 
 async function initializeApp() {
   const app = express();
-  const pool = new Pool(config.postgres.connection);
+  const pool = new Pool({
+    connectionString: config.postgres.connectionString,
+  });
 
   const changeDetection = createPollingChangeDetection(
     pool,
