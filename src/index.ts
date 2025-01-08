@@ -91,7 +91,7 @@ async function shutdown(
     }
 
     logger.info('Graceful shutdown completed.');
-    process.exitCode = 0;
+    process.exitCode = 1;
   } catch (error) {
     logger.error('Error during shutdown.', error as Error);
     process.exitCode = 1;
