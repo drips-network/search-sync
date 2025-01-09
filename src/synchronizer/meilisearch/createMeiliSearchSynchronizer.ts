@@ -130,7 +130,7 @@ export function createMeiliSearchSynchronizer(
           'chain',
         ],
         distinctAttribute: 'id',
-        filterableAttributes: ['name', 'chain'],
+        filterableAttributes: ['name', 'chain', 'ownerAddress'],
         displayedAttributes: [
           'name',
           'id',
@@ -162,7 +162,7 @@ export function createMeiliSearchSynchronizer(
           'chain',
         ],
         distinctAttribute: 'id',
-        filterableAttributes: ['name', 'chain'],
+        filterableAttributes: ['name', 'chain', 'ownerAddress'],
         displayedAttributes: [
           'id',
           'name',
