@@ -26,6 +26,8 @@ export type Project = {
   emoji: string;
   color: string;
   chain: string;
+  ownerName: string;
+  repoName: string;
 };
 
 export type Changes = {
