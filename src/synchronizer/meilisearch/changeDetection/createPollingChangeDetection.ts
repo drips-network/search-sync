@@ -42,11 +42,13 @@ export function createPollingChangeDetection(
     const dripListsSql = (schema: DbSchema) => `
       SELECT "id", "name", "description", "ownerAddress", "ownerAccountId", '${schema}' AS chain
       FROM ${schema}."DripLists"
+      WHERE "isVisible" = TRUE
     `;
 
     const projectsSql = (schema: DbSchema) => `
       SELECT "id", "name", "description", "ownerAddress", "ownerAccountId", "url", "avatarCid", "emoji", "color", '${schema}' AS chain
       FROM ${schema}."GitProjects"
+      WHERE "isVisible" = TRUE
     `;
 
     const dripListsQueries = schemas.map(chain => dripListsSql(chain));
