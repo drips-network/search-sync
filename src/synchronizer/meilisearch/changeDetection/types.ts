@@ -13,6 +13,7 @@ export type DripList = {
   ownerAddress: string;
   ownerAccountId: string;
   chain: string;
+  isVisible: boolean;
 };
 
 export type Project = {
@@ -28,6 +29,8 @@ export type Project = {
   chain: string;
   ownerName: string;
   repoName: string;
+  isVisible: boolean;
+  verificationStatus: 'Claimed' | 'Unclaimed';
 };
 
 export type Changes = {
