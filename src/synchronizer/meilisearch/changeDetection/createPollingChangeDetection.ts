@@ -46,7 +46,7 @@ export function createPollingChangeDetection(
     `;
 
     const projectsSql = (schema: DbSchema) => `
-      SELECT "id", "name", "description", "ownerAddress", "ownerAccountId", "url", "avatarCid", "emoji", "color", "isVisible", "verificationStatus", '${schema}' AS chain
+      SELECT "id", "name", "description", "ownerAddress", "ownerAccountId", "url", "avatarCid", "emoji", "color", "isVisible", "verificationStatus"::TEXT, '${schema}' AS chain
       FROM ${schema}."GitProjects"
     `;
 
