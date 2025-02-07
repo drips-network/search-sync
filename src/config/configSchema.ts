@@ -1,6 +1,12 @@
 import {z} from 'zod';
 
-export const ALLOWED_DB_SCHEMAS = ['sepolia', 'mainnet', 'filecoin', 'metis'] as const;
+export const ALLOWED_DB_SCHEMAS = [
+  'sepolia',
+  'mainnet',
+  'filecoin',
+  'metis',
+  'localtestnet',
+] as const;
 export type DbSchema = (typeof ALLOWED_DB_SCHEMAS)[number];
 
 export const postgresConfigSchema = z.object({
