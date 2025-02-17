@@ -4,6 +4,7 @@ export const ALLOWED_DB_SCHEMAS = [
   'sepolia',
   'mainnet',
   'filecoin',
+  'optimism',
   'metis',
   'localtestnet',
 ] as const;
