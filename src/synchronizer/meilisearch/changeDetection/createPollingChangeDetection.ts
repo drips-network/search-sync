@@ -40,14 +40,14 @@ export function createPollingChangeDetection(
 
   const getAllRecords = async (): Promise<Changes> => {
     const dripListsSql = (schema: DbSchema) => `
-      SELECT "id", "name", "description", "ownerAddress", "ownerAccountId", "isVisible", '${schema}' AS chain
-      FROM ${schema}."DripLists"
-      WHERE "isVisible" = TRUE
+      SELECT "account_id" as "id", "name", "description", "owner_address" as "ownerAddress", "owner_account_id" as "ownerAccountId", "is_visible" as "isVisible", '${schema}' AS chain
+      FROM ${schema}."drip_lists"
+      WHERE "is_visible" = TRUE
     `;
 
     const projectsSql = (schema: DbSchema) => `
-      SELECT "id", "name", "description", "ownerAddress", "ownerAccountId", "url", "avatarCid", "emoji", "color", "isVisible", "verificationStatus"::TEXT, '${schema}' AS chain
-      FROM ${schema}."GitProjects"
+      SELECT "account_id" as "id", "name", "owner_address" as "ownerAddress", "owner_account_id" as "ownerAccountId", "url", "avatar_cid" as "avatarCid", "emoji", "color", "is_visible" as "isVisible", "verification_status"::TEXT as "verificationStatus", '${schema}' AS chain
+      FROM ${schema}."projects"
     `;
 
     const dripListsQueries = schemas.map(chain => dripListsSql(chain));

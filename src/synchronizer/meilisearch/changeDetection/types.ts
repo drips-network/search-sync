@@ -20,7 +20,6 @@ export type Project = {
   id: string;
   url: string;
   name: string;
-  description: string;
   ownerAddress: string;
   ownerAccountId: string;
   avatarCid: string;
@@ -30,7 +29,7 @@ export type Project = {
   ownerName: string;
   repoName: string;
   isVisible: boolean;
-  verificationStatus: 'Claimed' | 'Unclaimed';
+  verificationStatus: 'claimed' | 'unclaimed' | 'pending_metadata';
 };
 
 export type Changes = {

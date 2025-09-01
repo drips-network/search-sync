@@ -38,7 +38,6 @@ export function createMeiliSearchSynchronizer(
             id: p.id,
             name: p.name,
             type: 'project',
-            description: p.description,
             ownerAddress: p.ownerAddress,
             ownerAccountId: p.ownerAccountId,
             url: p.url,
@@ -158,7 +157,6 @@ export function createMeiliSearchSynchronizer(
         searchableAttributes: [
           'id',
           'name',
-          'description',
           'url',
           'ownerAddress',
           'ownerAccountId',
@@ -182,7 +180,6 @@ export function createMeiliSearchSynchronizer(
           'id',
           'name',
           'type',
-          'description',
           'ownerAddress',
           'ownerAccountId',
           'url',
