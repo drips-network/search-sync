@@ -48,6 +48,7 @@ export function createPollingChangeDetection(
     const projectsSql = (schema: DbSchema) => `
       SELECT "account_id" as "id", "name", "owner_address" as "ownerAddress", "owner_account_id" as "ownerAccountId", "url", "avatar_cid" as "avatarCid", "emoji", "color", "is_visible" as "isVisible", "verification_status"::TEXT as "verificationStatus", '${schema}' AS chain
       FROM ${schema}."projects"
+      WHERE "verification_status" IN ('claimed', 'unclaimed')
     `;
 
     const dripListsQueries = schemas.map(chain => dripListsSql(chain));
