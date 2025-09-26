@@ -1,5 +1,6 @@
 /* eslint-disable n/no-process-exit */
 import {Pool} from 'pg';
+import type {Server as HttpServer} from 'http';
 import {createMeiliSearchSynchronizer} from './synchronizer/meilisearch/createMeiliSearchSynchronizer';
 import MeiliSearch from 'meilisearch';
 import {createPollingChangeDetection} from './synchronizer/meilisearch/changeDetection/createPollingChangeDetection';
@@ -7,6 +8,7 @@ import {logger} from './logger';
 import * as winston from 'winston';
 import {Synchronizer} from './synchronizer/types';
 import {config} from './config/configLoader';
+import {startHealthServer, stopHealthServer} from './health';
 
 async function initializeApp() {
   const pool = new Pool({
@@ -37,13 +39,17 @@ async function main() {
 
   const {pool, synchronizer} = await initializeApp();
 
-  registerShutdownHandlers(pool, synchronizer, logger);
+  let healthServer: HttpServer | undefined;
+
+  registerShutdownHandlers(pool, synchronizer, logger, () => healthServer);
 
   try {
     await synchronizer.start();
+
+    healthServer = startHealthServer({pool, synchronizer, logger});
   } catch (error) {
     logger.error('Failed to start sync process:', error as Error);
-    await shutdown(pool, synchronizer, 'STARTUP_ERROR', logger);
+    await shutdown(pool, synchronizer, 'STARTUP_ERROR', logger, healthServer);
   }
 }
 
@@ -52,10 +58,12 @@ async function shutdown(
   synchronizer: Synchronizer,
   signal: string,
   logger: winston.Logger,
+  healthServer?: HttpServer,
 ) {
   logger.info(`${signal} received, starting graceful shutdown...`);
 
   try {
+    await stopHealthServer(healthServer, logger);
     await synchronizer.stop();
     await pool.end();
 
@@ -71,9 +79,12 @@ function registerShutdownHandlers(
   pool: Pool,
   synchronizer: Synchronizer,
   logger: winston.Logger,
+  getHealthServer: () => HttpServer | undefined,
 ) {
   ['SIGTERM', 'SIGINT'].forEach(signal => {
-    process.once(signal, () => shutdown(pool, synchronizer, signal, logger));
+    process.once(signal, () =>
+      shutdown(pool, synchronizer, signal, logger, getHealthServer()),
+    );
   });
 }
 

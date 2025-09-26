@@ -7,7 +7,7 @@ dotenvExpand.expand(dotenv.config());
 
 function loadConfig(): Config {
   const config = {
-    env: process.env.NODE_ENV,
+    nodeEnv: process.env.NODE_ENV,
     postgres: {
       connectionString: process.env.DB_CONNECTION_STRING,
       changeDetection: {
@@ -29,6 +29,14 @@ function loadConfig(): Config {
       format: process.env.LOG_FORMAT,
       destination: process.env.LOG_DESTINATION,
       filename: process.env.LOG_FILE,
+    },
+    health: {
+      enabled:
+        process.env.HEALTH_ENABLED && process.env.HEALTH_ENABLED === 'true',
+      host: process.env.HEALTH_HOST,
+      port: process.env.HEALTH_PORT
+        ? parseInt(process.env.HEALTH_PORT, 10)
+        : undefined,
     },
   };
 

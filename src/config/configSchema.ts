@@ -31,15 +31,23 @@ export const loggingConfigSchema = z.object({
   filename: z.string().optional(),
 });
 
+export const healthConfigSchema = z.object({
+  enabled: z.boolean().default(true),
+  host: z.string().default('127.0.0.1'),
+  port: z.number().int().positive().default(8081),
+});
+
 export const configSchema = z.object({
   nodeEnv: z.enum(['development', 'test', 'production']).default('development'),
   port: z.number().int().positive().default(3000),
   postgres: postgresConfigSchema,
   meiliSearch: meiliSearchConfigSchema,
   logging: loggingConfigSchema,
+  health: healthConfigSchema,
 });
 
 export type PostgresConfig = z.infer<typeof postgresConfigSchema>;
 export type MeiliSearchConfig = z.infer<typeof meiliSearchConfigSchema>;
 export type LoggingConfig = z.infer<typeof loggingConfigSchema>;
+export type HealthConfig = z.infer<typeof healthConfigSchema>;
 export type Config = z.infer<typeof configSchema>;
