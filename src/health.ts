@@ -109,6 +109,19 @@ export function evaluateSynchronizer(
     };
   }
 
+  const now = Date.now();
+  const maxStaleMs = 10 * 60 * 1000; // 10 minutes
+  const timeSinceLastSync = now - lastSyncTimestamp;
+
+  if (timeSinceLastSync > maxStaleMs) {
+    return {
+      status: 'fail',
+      lastSyncTime: metrics.lastSyncTime.toISOString(),
+      totalProcessedRecords: metrics.totalProcessedRecords,
+      message: `Last sync was ${Math.round(timeSinceLastSync / 1000)}s ago (stale after ${maxStaleMs / 1000}s).`,
+    };
+  }
+
   return {
     status: 'ok',
     lastSyncTime: metrics.lastSyncTime.toISOString(),
