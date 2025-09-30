@@ -33,7 +33,7 @@ export const loggingConfigSchema = z.object({
 
 export const healthConfigSchema = z.object({
   enabled: z.boolean().default(true),
-  host: z.string().default('0.0.0.0'),
+  host: z.string().default('::'),
   port: z.number().int().positive().default(3000),
 });
 
