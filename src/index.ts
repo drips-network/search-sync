@@ -44,9 +44,9 @@ async function main() {
   registerShutdownHandlers(pool, synchronizer, logger, () => healthServer);
 
   try {
-    await synchronizer.start();
-
     healthServer = startHealthServer({pool, synchronizer, logger});
+
+    await synchronizer.start();
   } catch (error) {
     logger.error('Failed to start sync process:', error as Error);
     await shutdown(pool, synchronizer, 'STARTUP_ERROR', logger, healthServer);
