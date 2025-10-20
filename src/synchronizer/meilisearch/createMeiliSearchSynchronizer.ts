@@ -88,23 +88,6 @@ export function createMeiliSearchSynchronizer(
           stack: error instanceof Error ? error.stack : undefined,
         },
       });
-      // Stop change detection and reset state on sync failure.
-      isRunning = false;
-      await changeDetection.stop().catch(stopError => {
-        logger.warn(
-          'Error while stopping change detection after sync failure:',
-          {
-            metadata: {
-              error:
-                stopError instanceof Error
-                  ? stopError.message
-                  : String(stopError),
-            },
-          },
-        );
-      });
-
-      throw error;
     }
   };
 

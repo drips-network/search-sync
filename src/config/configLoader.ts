@@ -37,6 +37,9 @@ function loadConfig(): Config {
       port: process.env.HEALTH_PORT
         ? parseInt(process.env.HEALTH_PORT, 10)
         : undefined,
+      maxStaleMs: process.env.HEALTH_MAX_STALE_MS
+        ? parseInt(process.env.HEALTH_MAX_STALE_MS, 10)
+        : undefined,
     },
   };
 
