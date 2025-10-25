@@ -35,6 +35,11 @@ export const healthConfigSchema = z.object({
   enabled: z.boolean().default(true),
   host: z.string().default('::'),
   port: z.number().int().positive().default(3000),
+  maxStaleMs: z
+    .number()
+    .int()
+    .positive()
+    .default(10 * 60 * 1000), // 10 minutes
 });
 
 export const configSchema = z.object({

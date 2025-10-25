@@ -37,7 +37,10 @@ export function createHealthRequestHandler({
     }
 
     const postgresStatus = await performPostgresCheck(pool, logger);
-    const synchronizerStatus = evaluateSynchronizer(synchronizer);
+    const synchronizerStatus = evaluateSynchronizer(
+      synchronizer,
+      config.health.maxStaleMs,
+    );
 
     const isHealthy =
       postgresStatus.status === 'ok' && synchronizerStatus.status === 'ok';
@@ -88,6 +91,7 @@ export async function performPostgresCheck(
 
 export function evaluateSynchronizer(
   synchronizer: Synchronizer,
+  maxStaleMs: number,
 ): HealthComponentStatus {
   const metrics = synchronizer.getMetrics();
   if (!metrics.lastSyncTime) {
@@ -110,7 +114,6 @@ export function evaluateSynchronizer(
   }
 
   const now = Date.now();
-  const maxStaleMs = 10 * 60 * 1000; // 10 minutes
   const timeSinceLastSync = now - lastSyncTimestamp;
 
   if (timeSinceLastSync > maxStaleMs) {
